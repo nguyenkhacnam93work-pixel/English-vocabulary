@@ -2,6 +2,7 @@
   "name": "English Vocabulary",
   "short_name": "English Vocab",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f5f7fb",
   "theme_color": "#5b63d8",
