@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>English Vocabulary</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#f5f7fb;color:#172033;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:30px}
+header{
+  background:white;padding:22px 20px 16px;
+  position:sticky;top:0;z-index:5;border-bottom:1px solid #e8ebf0
+}
+h1{font-size:25px;margin:0 0 5px}
+.subtitle{color:#6b7280;font-size:14px}
+main{padding:16px}
+.card{
+  background:white;border-radius:18px;padding:18px;margin-bottom:14px;
+  box-shadow:0 3px 16px rgba(20,30,50,.06)
+}
+h2{font-size:19px;margin:0 0 15px}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px;color:#4b5563}
+input,textarea,select{
+  width:100%;border:1px solid #dfe3ea;border-radius:12px;
+  padding:12px;font-size:16px;background:#fff;outline:none
+}
+input:focus,textarea:focus,select:focus{border-color:#6575e8}
+textarea{resize:vertical;min-height:70px}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+button{
+  border:0;border-radius:12px;padding:12px 15px;font-size:16px;
+  font-weight:650;cursor:pointer
+}
+.primary{background:#5b63d8;color:white;width:100%;margin-top:14px}
+.secondary{background:#eef0ff;color:#4049a8}
+.danger{background:#fff0f0;color:#c0392b}
+.word{
+  padding:14px 0;border-bottom:1px solid #edf0f4
+}
+.word:last-child{border-bottom:0}
+.word-en{font-size:20px;font-weight:750}
+.word-vi{margin-top:4px;color:#4b5563}
+.word-meta{font-size:12px;color:#8a93a3;margin-top:6px}
+.small-btn{padding:7px 10px;font-size:13px;margin-top:8px}
+.empty{color:#7b8493;text-align:center;padding:20px 0}
+.stats{display:flex;gap:10px}
+.stat{
+  flex:1;background:#f7f8ff;border-radius:14px;padding:13px;text-align:center
+}
+.stat b{display:block;font-size:23px}
+.stat span{font-size:12px;color:#6b7280}
+#learnOverlay{
+  display:none;position:fixed;inset:0;background:#f7f8fc;z-index:20;
+  padding:env(safe-area-inset-top) 18px env(safe-area-inset-bottom)
+}
+.learn-wrap{max-width:520px;margin:auto;height:100%;display:flex;flex-direction:column}
+.learn-top{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+.progress{font-size:13px;color:#697386}
+.close{background:#e9ecf2;color:#3f4652}
+.learn-card{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center
+}
+.learn-vi{font-size:26px;color:#596273;margin-bottom:22px}
+.learn-en{font-size:42px;font-weight:800;letter-spacing:-1px}
+.learn-count{font-size:15px;color:#727b8b;margin-top:18px}
+.learn-bottom{padding:18px 0 28px}
+.note{
+  background:#fff8df;border-radius:12px;padding:11px 13px;
+  font-size:13px;color:#6b5a20;margin-top:12px
+}
+.hidden{display:none!important}
+.search{margin-bottom:10px}
+.date-title{font-weight:750;margin:18px 0 8px}
+.toast{
+  position:fixed;left:50%;bottom:25px;transform:translateX(-50%);
+  background:#1f2937;color:white;padding:10px 16px;border-radius:12px;
+  display:none;z-index:50;font-size:14px
+}
+@media (prefers-color-scheme: dark){
+  body{background:#10131a;color:#f1f3f7}
+  header,.card{background:#181c25;border-color:#272d39}
+  input,textarea,select{background:#11151c;color:#f1f3f7;border-color:#303746}
+  .subtitle,.word-vi,.word-meta,.progress,.learn-count{color:#9aa3b2}
+  .stat{background:#202535}
+  .learn-wrap{color:#f1f3f7}
+}
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5b63d8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="English Vocab">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+</head>
+<body>
+
+<div class="app">
+<header>
+  <h1>📚 English Vocabulary</h1>
+  <div class="subtitle">Học 5–10 từ mỗi ngày, tự động phát âm</div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>🎯 Học hôm nay</h2>
+    <div class="stats">
+      <div class="stat"><b id="todayCount">0</b><span>từ hôm nay</span></div>
+      <div class="stat"><b id="totalCount">0</b><span>tổng số từ</span></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="secondary" onclick="startLearning(5)">Học 5 từ</button>
+      <button class="secondary" onclick="startLearning(10)">Học 10 từ</button>
+    </div>
+    <div class="note">Mỗi từ: đọc nghĩa tiếng Việt → đọc tiếng Anh 5 lần → tự chuyển sang từ tiếp theo.</div>
+  </section>
+
+  <section class="card">
+    <h2>➕ Thêm từ mới</h2>
+    <label>Tiếng Anh</label>
+    <input id="english" placeholder="appointment">
+    <label>Nghĩa tiếng Việt</label>
+    <input id="vietnamese" placeholder="cuộc hẹn">
+    <label>Ví dụ (không bắt buộc)</label>
+    <textarea id="example" placeholder="I have an appointment."></textarea>
+    <button class="primary" onclick="addWord()">💾 Lưu từ</button>
+  </section>
+
+  <section class="card">
+    <h2>📖 Kho từ vựng</h2>
+    <input class="search" id="search" placeholder="🔎 Tìm từ..." oninput="renderWords()">
+    <div id="wordList"></div>
+  </section>
+</main>
+</div>
+
+<div id="learnOverlay">
+  <div class="learn-wrap">
+    <div class="learn-top">
+      <div class="progress" id="learnProgress"></div>
+      <button class="close" onclick="stopLearning()">✕ Đóng</button>
+    </div>
+    <div class="learn-card">
+      <div class="learn-vi" id="learnVi"></div>
+      <div class="learn-en" id="learnEn"></div>
+      <div class="learn-count" id="learnCount"></div>
+    </div>
+    <div class="learn-bottom">
+      <button class="primary" id="pauseBtn" onclick="togglePause()">⏸ Tạm dừng</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const KEY = "english_vocabulary_words_v1";
+let words = JSON.parse(localStorage.getItem(KEY) || "[]");
+let learning = false, paused = false, current = 0, repeat = 0, queue = [];
+
+function todayISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function save(){localStorage.setItem(KEY, JSON.stringify(words))}
+function toast(msg){
+  const el=document.getElementById("toast"); el.textContent=msg; el.style.display="block";
+  setTimeout(()=>el.style.display="none",1800);
+}
+function addWord(){
+  const en=document.getElementById("english").value.trim();
+  const vi=document.getElementById("vietnamese").value.trim();
+  const ex=document.getElementById("example").value.trim();
+  if(!en||!vi){toast("Hãy nhập từ và nghĩa tiếng Việt");return}
+  words.unshift({id:Date.now(),english:en,vietnamese:vi,example:ex,date:todayISO()});
+  save();
+  document.getElementById("english").value="";
+  document.getElementById("vietnamese").value="";
+  document.getElementById("example").value="";
+  render();
+  toast("✅ Đã lưu từ mới");
+}
+function deleteWord(id){
+  if(!confirm("Xóa từ này khỏi kho từ vựng?")) return;
+  words=words.filter(w=>w.id!==id); save(); render();
+}
+function render(){
+  const today=todayISO();
+  document.getElementById("todayCount").textContent=words.filter(w=>w.date===today).length;
+  document.getElementById("totalCount").textContent=words.length;
+  renderWords();
+}
+function renderWords(){
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const list=document.getElementById("wordList");
+  const filtered=words.filter(w=>
+    w.english.toLowerCase().includes(q) ||
+    w.vietnamese.toLowerCase().includes(q)
+  );
+  if(!filtered.length){list.innerHTML='<div class="empty">Chưa có từ phù hợp.</div>';return}
+  let lastDate="";
+  let html="";
+  filtered.forEach(w=>{
+    if(w.date!==lastDate){
+      lastDate=w.date;
+      html+=`<div class="date-title">📅 ${w.date}</div>`;
+    }
+    html+=`<div class="word">
+      <div class="word-en">${esc(w.english)}</div>
+      <div class="word-vi">${esc(w.vietnamese)}</div>
+      ${w.example?`<div class="word-meta">💬 ${esc(w.example)}</div>`:""}
+      <div class="word-meta">Ngày thêm: ${w.date}</div>
+      <button class="small-btn danger" onclick="deleteWord(${w.id})">Xóa</button>
+    </div>`;
+  });
+  list.innerHTML=html;
+}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function startLearning(n){
+  const today=todayISO();
+  queue=words.filter(w=>w.date===today).slice(0,n);
+  if(!queue.length){toast("Hôm nay chưa có từ để học");return}
+  learning=true; paused=false; current=0; repeat=0;
+  document.getElementById("learnOverlay").style.display="block";
+  document.getElementById("pauseBtn").textContent="⏸ Tạm dừng";
+  speakCurrent();
+}
+function speak(text,lang,onEnd){
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang; u.rate=0.82; u.pitch=1; u.volume=1;
+  u.onend=()=>setTimeout(()=>{if(!paused&&learning)onEnd()},450);
+  u.onerror=()=>setTimeout(()=>{if(!paused&&learning)onEnd()},450);
+  speechSynthesis.speak(u);
+}
+function speakCurrent(){
+  if(!learning||paused)return;
+  if(current>=queue.length){finishLearning();return}
+  const w=queue[current];
+  document.getElementById("learnProgress").textContent=`Từ ${current+1} / ${queue.length}`;
+  document.getElementById("learnVi").textContent=w.vietnamese;
+  document.getElementById("learnEn").textContent=w.english;
+  document.getElementById("learnCount").textContent="Đang nghe nghĩa tiếng Việt…";
+  repeat=0;
+  speak(w.vietnamese,"vi-VN",speakEnglish);
+}
+function speakEnglish(){
+  if(!learning||paused)return;
+  if(repeat>=5){
+    current++;
+    setTimeout(speakCurrent,800);
+    return;
+  }
+  repeat++;
+  document.getElementById("learnCount").textContent=`🔊 Tiếng Anh: lần ${repeat} / 5`;
+  speak(queue[current].english,"en-US",speakEnglish);
+}
+function togglePause(){
+  if(!learning)return;
+  paused=!paused;
+  const btn=document.getElementById("pauseBtn");
+  if(paused){
+    speechSynthesis.cancel(); btn.textContent="▶ Tiếp tục";
+    document.getElementById("learnCount").textContent="Đã tạm dừng";
+  }else{
+    btn.textContent="⏸ Tạm dừng"; speakCurrent();
+  }
+}
+function stopLearning(){
+  learning=false; paused=false; speechSynthesis.cancel();
+  document.getElementById("learnOverlay").style.display="none";
+}
+function finishLearning(){
+  learning=false; speechSynthesis.cancel();
+  document.getElementById("learnVi").textContent="🎉 Hoàn thành!";
+  document.getElementById("learnEn").textContent="";
+  document.getElementById("learnCount").textContent=`Anh đã học xong ${queue.length} từ hôm nay.`;
+  document.getElementById("pauseBtn").textContent="Đóng";
+  document.getElementById("pauseBtn").onclick=stopLearning;
+}
+render();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>
